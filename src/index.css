@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for Light Mode */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-quaternary: #f5f5f5;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-tertiary: #adb5bd;
+  --border-color: #dee2e6;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-hover: rgba(0, 0, 0, 0.15);
+  --accent-color: #0d6efd;
+  --accent-hover: #0b5ed7;
+  --error-color: #dc3545;
+  --warning-color: #f59e0b;
+  --success-color: #51cf66;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Brand Colors */
+  --brand-primary: #2563EB;
+  --brand-secondary: #1E40AF;
+  --brand-alpha: rgba(37, 99, 235, 0.1);
+  --brand-gradient: linear-gradient(to bottom right, #667eea, #764ba2);
+}
+
+/* CSS Variables for Dark Mode */
+[data-theme="dark"] {
+  --bg-primary: #111827;
+  /* Base warna */
+  --bg-secondary: #0E1420;
+  /* Untuk bg sidebar dan header */
+  --bg-tertiary: #090D15;
+  /* Yang lebih gelap */
+  --bg-quaternary: #161f2e;
+  /* Yang lebih terang */
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --text-tertiary: #6c757d;
+  --border-color: #404040;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-hover: rgba(0, 0, 0, 0.5);
+  --accent-color: #4dabf7;
+  --accent-hover: #339af0;
+  --error-color: #dc3545;
+  --warning-color: #f59e0b;
+  --success-color: #51cf66;
+
+  /* Brand Colors Dark */
+  --brand-primary: #1E40AF;
+  --brand-secondary: #1E3A8A;
+  --brand-alpha: rgba(30, 58, 138, 0.3);
+}
+
+/* Red Theme Override (DANANTRA) */
+.red-theme {
+  --brand-primary: #dc2626 !important;
+  --brand-secondary: #991b1b !important;
+  --brand-alpha: rgba(220, 38, 38, 0.1) !important;
+  --brand-gradient: linear-gradient(to bottom right, #ef4444, #991b1b) !important;
+  --accent-color: #dc2626 !important;
+  --accent-hover: #991b1b !important;
+}
+
+/* Green Theme Override (AMITRA) */
+.green-theme {
+  --brand-primary: #10b981 !important;
+  --brand-secondary: #047857 !important;
+  --brand-alpha: rgba(16, 185, 129, 0.1) !important;
+  --brand-gradient: linear-gradient(to bottom right, #34d399, #059669) !important;
+  --accent-color: #10b981 !important;
+  --accent-hover: #059669 !important;
+}
+
+/* Blue Theme (FIFGROUP - Default) */
+.blue-theme {
+  --brand-primary: #2563EB !important;
+  --brand-secondary: #1E40AF !important;
+  --brand-alpha: rgba(37, 99, 235, 0.1) !important;
+  --brand-gradient: linear-gradient(to bottom right, #667eea, #764ba2) !important;
+  --accent-color: #2563EB !important;
+  --accent-hover: #1E40AF !important;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Global Scrollbar Styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Dark mode scrollbar */
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background-color: #404040;
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background-color: #4a4a4a;
+}

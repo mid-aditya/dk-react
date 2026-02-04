@@ -8,10 +8,13 @@ import CallUI from '../../components/ui/CallUI';
 import ChatInput from '../../components/ui/ChatInput';
 import { JourneyStep } from '../../components/ui/Journey';
 import MessageBubble from '../../components/ui/MessageBubble';
-import { ThemeType } from '../../components/ui/ThemeSwitcher';
+import ThemeSwitcher, { ThemeType } from '../../components/ui/ThemeSwitcher';
+import { useTheme } from '../../contexts/ThemeContext';
 import { notifyAppReady, sendNativeNotification, updateNativeBadge } from '../../utils/NativeBridge';
 
 const OmnichatMobile: React.FC = () => {
+    const { theme: globalTheme, setTheme: setGlobalTheme } = useTheme();
+
     // -- Native Integration Examples
     // 1. Unread Count handling
     // 2. Notification triggering
@@ -21,7 +24,27 @@ const OmnichatMobile: React.FC = () => {
     React.useEffect(() => {
         // Signal native app that web is ready
         notifyAppReady();
-    }, []);
+
+        // Check for theme mode in URL
+        const params = new URLSearchParams(window.location.search);
+        const modeParam = params.get('mode');
+        if (modeParam === 'light' || modeParam === 'dark') {
+            if (modeParam !== globalTheme) {
+                setGlobalTheme(modeParam);
+            }
+        }
+
+        // Expose function for native app to switch theme dynamically
+        (window as any).setThemeMode = (mode: 'light' | 'dark') => {
+            if (mode === 'light' || mode === 'dark') {
+               setGlobalTheme(mode);
+            }
+        };
+
+        return () => {
+            delete (window as any).setThemeMode;
+        };
+    }, [globalTheme, setGlobalTheme]);
 
     // Sync Badge whenever count changes
     React.useEffect(() => {
@@ -481,7 +504,7 @@ const OmnichatMobile: React.FC = () => {
         </div>
       )}
       
-      {/* <ThemeSwitcher currentTheme={theme} onThemeChange={setTheme} /> */}
+      <ThemeSwitcher currentTheme={theme} onThemeChange={setTheme} />
     </div>
   );
 };

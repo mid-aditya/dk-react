@@ -7,10 +7,19 @@ import Tabs from '../../components/ticketing/Tabs';
 import CallUI from '../../components/ui/CallUI';
 import ChatInput from '../../components/ui/ChatInput';
 import { JourneyStep } from '../../components/ui/Journey';
-import MessageBubble from '../../components/ui/MessageBubble';
+import MessageBubble, { MessageAttachment } from '../../components/ui/MessageBubble';
 import ThemeSwitcher, { ThemeType } from '../../components/ui/ThemeSwitcher';
 import { useTheme } from '../../contexts/ThemeContext';
 import { notifyAppReady, requestNativeLocation, sendNativeNotification, updateNativeBadge } from '../../utils/NativeBridge';
+
+interface ChatMessage {
+  id: string;
+  message?: string;
+  time: string;
+  isAgent: boolean;
+  showReadIcon?: boolean;
+  attachment?: MessageAttachment;
+}
 
 const OmnichatMobile: React.FC = () => {
     const { theme: globalTheme, setTheme: setGlobalTheme } = useTheme();
@@ -82,6 +91,73 @@ const OmnichatMobile: React.FC = () => {
   const [showTicketStatus, setShowTicketStatus] = useState(false);
   const [ticketStatus, setTicketStatus] = useState('Connected');
   const [ticketNote, setTicketNote] = useState('Pelanggan menanyakan status pengiriman yang terlambat.');
+
+  // Chat Messages State
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { id: '1', message: "Lorem ipsum dolor sit amet consectetur. Tempor est adipiscing tellus diam et.", time: "12:30 PM", isAgent: false, showReadIcon: true },
+    { id: '2', message: "Hey Wafiy, thanks for reaching out! Let me check on that for you.", time: "12:32 PM", isAgent: true, showReadIcon: true },
+    { id: '3', message: "I need help with my order #12345", time: "12:33 PM", isAgent: false, showReadIcon: false },
+    { id: '4', message: "Sure, I can help you with that. Let me look up your order details.", time: "12:34 PM", isAgent: true, showReadIcon: true },
+    { id: '5', message: "Thank you! I've been waiting for 3 days now.", time: "12:35 PM", isAgent: false, showReadIcon: false },
+    { id: '6', message: "I understand your concern. I found your order and it's currently being processed. It should be shipped tomorrow.", time: "12:36 PM", isAgent: true, showReadIcon: true },
+  ]);
+
+  const handleSendMessage = (text: string, files: File[]) => {
+    const newMessages: ChatMessage[] = [];
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Handle files first
+    files.forEach((file, index) => {
+        let type: 'image' | 'video' | 'file' = 'file';
+        if (file.type.startsWith('image/')) type = 'image';
+        else if (file.type.startsWith('video/')) type = 'video';
+
+        newMessages.push({
+            id: Date.now() + '-file-' + index,
+            time,
+            isAgent: true, // Assuming sender is the agent (current user)
+            showReadIcon: false,
+            attachment: {
+                type,
+                url: URL.createObjectURL(file), // Create local URL for preview
+                name: file.name
+            }
+        });
+    });
+
+    // Handle text
+    if (text.trim()) {
+        newMessages.push({
+            id: Date.now() + '-text',
+            message: text,
+            time,
+            isAgent: true,
+            showReadIcon: false
+        });
+    }
+
+    if (newMessages.length > 0) {
+        setMessages(prev => [...prev, ...newMessages]);
+    }
+  };
+
+  const handleLocationShare = () => {
+    requestNativeLocation(); 
+    
+    // Add dummy location message to chat
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setMessages(prev => [...prev, {
+        id: Date.now() + '-loc',
+        time,
+        isAgent: true,
+        showReadIcon: false,
+        attachment: {
+            type: 'location',
+            latitude: -6.2,
+            longitude: 106.8
+        }
+    }]);
+  };
 
   // Masking helpers
   const maskName = (name: string) => {
@@ -426,56 +502,24 @@ const OmnichatMobile: React.FC = () => {
                 Chat telah terhubung dengan pengguna layanan pada 19 Oct 2025, 12:33:09
               </span>
             </div>
-            <MessageBubble
-              message="Lorem ipsum dolor sit amet consectetur. Tempor est adipiscing tellus diam et."
-              time="12:30 PM"
-              isAgent={false}
-              showReadIcon={true}
-            />
-            <MessageBubble
-              message="Hey Wafiy, thanks for reaching out! Let me check on that for you."
-              time="12:32 PM"
-              isAgent={true}
-              showReadIcon={true}
-            />
-            <MessageBubble
-              message="I need help with my order #12345"
-              time="12:33 PM"
-              isAgent={false}
-              showReadIcon={false}
-            />
-            <MessageBubble
-              message="Sure, I can help you with that. Let me look up your order details."
-              time="12:34 PM"
-              isAgent={true}
-              showReadIcon={true}
-            />
-            <MessageBubble
-              message="Thank you! I've been waiting for 3 days now."
-              time="12:35 PM"
-              isAgent={false}
-              showReadIcon={false}
-            />
-            <MessageBubble
-              message="I understand your concern. I found your order and it's currently being processed. It should be shipped tomorrow."
-              time="12:36 PM"
-              isAgent={true}
-              showReadIcon={true}
-            />
+            {messages.map((msg) => (
+              <MessageBubble
+                key={msg.id}
+                message={msg.message}
+                time={msg.time}
+                isAgent={msg.isAgent}
+                showReadIcon={msg.showReadIcon}
+                attachment={msg.attachment}
+              />
+            ))}
           </div>
           <ChatInput
             placeholder="Type Message"
-            onSend={(message, files) => {
-              console.log('Message:', message);
-              console.log('Files:', files);
-            }}
+            onSend={handleSendMessage}
             showAttachButton={true}
             showPlusButton={true}
             enableDragDrop={false}
-            onLocationSelect={() => {
-              console.log('Location Sharing Requested');
-              requestNativeLocation();
-            }}
+            onLocationSelect={handleLocationShare}
           />
         </div>
       )}

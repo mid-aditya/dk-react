@@ -30,7 +30,7 @@ declare global {
 }
 
 export type BridgeMessage = {
-    type: 'UPDATE_BADGE' | 'PUSH_NOTIFICATION' | 'OPEN_URL' | 'LOGOUT' | 'READY';
+    type: 'UPDATE_BADGE' | 'PUSH_NOTIFICATION' | 'OPEN_URL' | 'LOGOUT' | 'READY' | 'REQUEST_LOCATION';
     payload: any;
 };
 
@@ -84,5 +84,12 @@ export const notifyAppReady = () => {
     sendToNative({
         type: 'READY',
         payload: { timestamp: Date.now() }
+    });
+};
+
+export const requestNativeLocation = () => {
+    sendToNative({
+        type: 'REQUEST_LOCATION',
+        payload: {}
     });
 };

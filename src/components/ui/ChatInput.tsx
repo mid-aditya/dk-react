@@ -9,6 +9,7 @@ export interface ChatInputProps {
   showPlusButton?: boolean;
   enableDragDrop?: boolean;
   containerClassName?: string;
+  onLocationSelect?: () => void;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -20,12 +21,29 @@ const ChatInput: React.FC<ChatInputProps> = ({
   showPlusButton = true,
   enableDragDrop = true,
   containerClassName = '',
+  onLocationSelect,
 }) => {
   const [message, setMessage] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -170,14 +188,51 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </button>
         )} */}
         {showPlusButton && (
-          <button 
-            className="w-6 h-6 text-[var(--text-secondary)] cursor-pointer flex-shrink-0 bg-none border-none flex items-center justify-center rounded transition-all duration-200 p-0 hover:bg-[var(--bg-secondary)] hover:text-[var(--accent-color)]"
-            onClick={() => fileInputRef.current?.click()}
-            title="Add file"
-            type="button"
-          >
-            <i className="bx bx-plus text-base"></i>
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button 
+              className={`w-6 h-6 text-[var(--text-secondary)] cursor-pointer flex-shrink-0 bg-none border-none flex items-center justify-center rounded transition-all duration-200 p-0 hover:bg-[var(--bg-secondary)] hover:text-[var(--accent-color)] ${showMenu ? 'bg-[var(--bg-secondary)] text-[var(--accent-color)]' : ''}`}
+              onClick={() => setShowMenu(!showMenu)}
+              title="Add attachment"
+              type="button"
+            >
+              <i className={`bx ${showMenu ? 'bx-x' : 'bx-plus'} text-base`}></i>
+            </button>
+            
+            {showMenu && (
+              <div className="absolute bottom-full left-0 mb-3 w-56 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-lg overflow-hidden z-[100] flex flex-col p-1.5 animate-in fade-in zoom-in-95 duration-200">
+                <button
+                  className="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-tertiary)] flex items-center gap-3 text-[var(--text-primary)] text-sm rounded-lg transition-colors bg-transparent border-none cursor-pointer"
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setShowMenu(false);
+                  }}
+                >
+                  <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0">
+                    <i className="bx bx-image-add text-xl"></i>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-medium text-[13px]">Galeri / File</span>
+                    <span className="text-[10px] text-[var(--text-secondary)]">Foto, Video, Dokumen</span>
+                  </div>
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-tertiary)] flex items-center gap-3 text-[var(--text-primary)] text-sm rounded-lg transition-colors bg-transparent border-none cursor-pointer"
+                  onClick={() => {
+                    if (onLocationSelect) onLocationSelect();
+                    setShowMenu(false);
+                  }}
+                >
+                  <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 flex-shrink-0">
+                    <i className="bx bx-map-pin text-xl"></i>
+                  </div>
+                   <div className="flex flex-col">
+                    <span className="font-medium text-[13px]">Lokasi Anda</span>
+                    <span className="text-[10px] text-[var(--text-secondary)]">Bagikan lokasi terkini</span>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
         )}
         <input
           ref={fileInputRef}

@@ -10,7 +10,7 @@ import { JourneyStep } from '../../components/ui/Journey';
 import MessageBubble from '../../components/ui/MessageBubble';
 import ThemeSwitcher, { ThemeType } from '../../components/ui/ThemeSwitcher';
 import { useTheme } from '../../contexts/ThemeContext';
-import { notifyAppReady, sendNativeNotification, updateNativeBadge } from '../../utils/NativeBridge';
+import { notifyAppReady, requestNativeLocation, sendNativeNotification, updateNativeBadge } from '../../utils/NativeBridge';
 
 const OmnichatMobile: React.FC = () => {
     const { theme: globalTheme, setTheme: setGlobalTheme } = useTheme();
@@ -251,8 +251,8 @@ const OmnichatMobile: React.FC = () => {
                 </div>
                 <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[var(--bg-secondary)] border-2 border-[var(--bg-secondary)] flex items-center justify-center z-10 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
                   <img 
-                    src="/assets/icons/instagram.svg" 
-                    alt="Instagram"
+                    src="/assets/icons/whatsapp.svg" 
+                    alt="whatsapp"
                     className="w-full h-full rounded-full object-cover"
                   />
                 </div>
@@ -386,8 +386,8 @@ const OmnichatMobile: React.FC = () => {
                   />
                   <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[var(--bg-secondary)] border-2 border-[var(--bg-secondary)] flex items-center justify-center z-10 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
                     <img 
-                      src="/assets/icons/instagram.svg" 
-                      alt="Instagram"
+                      src="/assets/icons/whatsapp.svg" 
+                      alt="whatsapp"
                       className="w-full h-full rounded-full object-cover"
                     />
                   </div>
@@ -472,6 +472,10 @@ const OmnichatMobile: React.FC = () => {
             showAttachButton={true}
             showPlusButton={true}
             enableDragDrop={false}
+            onLocationSelect={() => {
+              console.log('Location Sharing Requested');
+              requestNativeLocation();
+            }}
           />
         </div>
       )}
